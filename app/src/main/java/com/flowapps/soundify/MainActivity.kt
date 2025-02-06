@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private var AUDIO_PERMISSION_CODE = 1
     private val readAudioFilesPermissionsOld = android.Manifest.permission.READ_EXTERNAL_STORAGE
     private lateinit var adapter: SongListAdapter
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer: MediaPlayer? = null
 
 
     @SuppressLint("InlinedApi")
@@ -53,15 +54,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestPermissionsLauncher()
+        binding.nowPlaying.animate().translationY(500F)
 
         binding.rvMusics.layoutManager = LinearLayoutManager(this)
         adapter = SongListAdapter(songs, SongListAdapter.OnClickListener { song ->
+
+            if (mediaPlayer != null) {
+                mediaPlayer!!.release()
+            }
+
+            mediaPlayer = MediaPlayer.create(this, song.uri)
 
             binding.tvSongName.text = song.title
             binding.tvSongArtist.text = song.artist
             binding.ivSongArt.setImageURI(song.getAlbumCoverURI())
 
-            mediaPlayer = MediaPlayer.create(this, song.uri)
+            if (binding.nowPlaying.visibility == View.GONE) {
+                binding.nowPlaying.visibility = View.VISIBLE
+                binding.nowPlaying.animate().translationY(binding.nowPlaying.measuredHeight.toFloat())
+                    .setDuration(resources.getInteger(android.R.integer.config_mediumAnimTime).toLong())
+            }
+
             playPauseSong()
         })
         binding.rvMusics.adapter = adapter
@@ -72,11 +85,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playPauseSong() {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
+        if (mediaPlayer == null)
+            return
+
+        if (mediaPlayer!!.isPlaying) {
+            mediaPlayer!!.pause()
             binding.btPlayPause.setImageResource(drawable.ic_media_play)
         } else {
-            mediaPlayer.start()
+            mediaPlayer!!.start()
             binding.btPlayPause.setImageResource(drawable.ic_media_pause)
         }
     }

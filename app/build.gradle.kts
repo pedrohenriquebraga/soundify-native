@@ -38,14 +38,15 @@ android {
 }
 
 dependencies {
-    var lottieVersion = "3.4.0";
+    val lottieVersion = "3.4.0";
 
-    implementation("com.airbnb.android:lottie:$lottieVersion")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("androidx.palette:palette:1.0.0")
+    implementation("com.airbnb.android:lottie:$lottieVersion")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
