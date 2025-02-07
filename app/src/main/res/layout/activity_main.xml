@@ -67,7 +67,7 @@
         android:background="?attr/shape"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="15dp"
         android:visibility="gone"
         >
 

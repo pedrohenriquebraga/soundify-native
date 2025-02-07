@@ -1,11 +1,11 @@
 package com.flowapps.soundify
 
-import android.R.*
+import android.R.drawable
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,12 +16,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flowapps.soundify.adapters.SongListAdapter
 import com.flowapps.soundify.databinding.ActivityMainBinding
 import com.flowapps.soundify.models.Song
+import com.flowapps.soundify.utils.ImageUtils
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.rvMusics.layoutManager = LinearLayoutManager(this)
         adapter = SongListAdapter(songs, SongListAdapter.OnClickListener { song ->
+            val imageUtils = ImageUtils(this, song.getAlbumCoverURI())
+            val dominantColor = imageUtils
+                .getPaletteColors(false)
+                .dominantSwatch
 
             if (mediaPlayer != null) {
                 mediaPlayer!!.release()
@@ -71,8 +79,23 @@ class MainActivity : AppCompatActivity() {
 
             if (binding.nowPlaying.visibility == View.GONE) {
                 binding.nowPlaying.visibility = View.VISIBLE
-                binding.nowPlaying.animate().translationY(binding.nowPlaying.measuredHeight.toFloat())
-                    .setDuration(resources.getInteger(android.R.integer.config_mediumAnimTime).toLong())
+                binding.nowPlaying.animate()
+                    .translationY(binding.nowPlaying.measuredHeight.toFloat())
+                    .setDuration(
+                        resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
+                    )
+            }
+
+            if (dominantColor != null) {
+                binding.nowPlaying.setBackgroundColor(
+                    Color.rgb(
+                        dominantColor.rgb.red,
+                        dominantColor.rgb.green,
+                        dominantColor.rgb.blue
+                    )
+                )
+                binding.tvSongName.setTextColor(dominantColor.titleTextColor)
+                binding.tvSongArtist.setTextColor(dominantColor.titleTextColor)
             }
 
             playPauseSong()
